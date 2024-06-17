@@ -1,0 +1,27 @@
+@* @model ToDoListResponse *@
+@* *@
+@* <h2>@Model.Title</h2> *@
+@* *@
+@* <div> *@
+@*     <dl> *@
+@*         <dt>@Html.DisplayNameFor(model => model.Title)</dt> *@
+@*         <dd>@Html.DisplayFor(model => model.Title)</dd> *@
+@*         <dt>@Html.DisplayNameFor(model => model.Description)</dt> *@
+@*         <dd>@Html.DisplayFor(model => model.Description)</dd> *@
+@*     </dl> *@
+@* </div> *@
+@* *@
+@* <div> *@
+@*     <h1>Tasks</h1> *@
+@*     @foreach(var task in Model.Tasks) *@
+@*     { *@
+@*         <div> *@
+@*             <h4>@task?.Title</h4> *@
+@*             <p>@task?.Description</p> *@
+@*             <p>@task?.DueDateTime.Day</p> *@
+@*             <p>@task?.CreatedAt</p> *@
+@*         </div> *@
+@*     } *@
+@* </div> *@
+@* *@
+@* <a asp-action="Index" class="btn btn-secondary">Back to List</a> *@

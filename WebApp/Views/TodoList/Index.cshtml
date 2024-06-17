@@ -1,0 +1,31 @@
+﻿@model IEnumerable<ToDoListResponse>
+
+<h2>To-Do Lists</h2>
+<h4>
+    <a href="~/todolist/create">Create Todo List</a>
+</h4>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Tasks</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var todoList in Model)
+    {
+        <tr>
+            <td>@todoList.Title</td>
+            <td>@todoList.Description</td>
+            <td>@(todoList.Tasks?.Count == 0 ? "No Tasks" : todoList.Tasks?.Count.ToString())</td>
+            <td>
+                <a href="~/todolist/get/@todoList.Id">View</a>
+                <a href="~/todolist/edit/@todoList.Id">Edit</a>
+                <a href="~/todolist/delete/@todoList.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
