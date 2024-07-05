@@ -1,12 +1,7 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Entities;
-using Entities.DTOs;
+namespace WebAPI.Controllers;
 using Entities.DTOs.TodoListDtos;
 using Microsoft.AspNetCore.Mvc;
 using ServiceContracts;
-
-namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -27,15 +22,16 @@ public class ToDoListController : ControllerBase
         return Ok(toDoLists);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetToDoList(Guid id)
     {
         var toDoList = await this._toDoListService.GetToDoListAsync(id);
-            if (toDoList == null)
-            {
-                return NotFound();
-            }
-            return Ok(toDoList);
+        if (toDoList == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(toDoList);
     }
 
     [HttpPost]
@@ -57,10 +53,10 @@ public class ToDoListController : ControllerBase
 
         if (updatedToDoList == null)
         {
-            return NotFound();
+            return this.NotFound();
         }
 
-        return Ok(updatedToDoList);
+        return this.Ok(updatedToDoList);
     }
 
     [HttpDelete("{id}")]
@@ -68,6 +64,6 @@ public class ToDoListController : ControllerBase
     {
         var deleted = await this._toDoListService.DeleteToDoListAsync(id);
 
-        return deleted ? NoContent() : NotFound();
+        return deleted ? this.NoContent() : this.NotFound();
     }
 }

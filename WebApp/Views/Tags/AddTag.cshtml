@@ -1,0 +1,74 @@
+@model TagAddRequest
+
+@section Styles {
+    <style>
+        .tag-form-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+        }
+        .tag-form-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-control, .btn-primary {
+            border-radius: 20px;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+        }
+        .cancel-btn {
+            margin-top: 15px;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 tag-form-section">
+            <h2 class="tag-form-header">Add Tag</h2>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <form asp-action="AddTag" asp-route-taskId="@ViewBag.TaskId" method="post">
+                <div class="form-group">
+                    <label asp-for="Name">Tag</label>
+                    <select asp-for="Name" class="form-control">
+                        <option value="">Select a tag (optional)</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="high_priority">High Priority</option>
+                        <option value="medium_priority">Medium Priority</option>
+                        <option value="low_priority">Low Priority</option>
+                        <option value="personal">Personal</option>
+                        <option value="work">Work</option>
+                        <option value="home">Home</option>
+                        <option value="health">Health</option>
+                    </select>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Add Tag</button>
+            </form>
+
+            <a asp-controller="TodoList" asp-action="Get" asp-route-id="@ViewBag.ToDoListId" class="btn btn-secondary mt-5 cancel-btn">Cancel</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

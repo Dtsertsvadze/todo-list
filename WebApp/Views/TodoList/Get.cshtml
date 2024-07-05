@@ -1,27 +1,128 @@
-@* @model ToDoListResponse *@
-@* *@
-@* <h2>@Model.Title</h2> *@
-@* *@
-@* <div> *@
-@*     <dl> *@
-@*         <dt>@Html.DisplayNameFor(model => model.Title)</dt> *@
-@*         <dd>@Html.DisplayFor(model => model.Title)</dd> *@
-@*         <dt>@Html.DisplayNameFor(model => model.Description)</dt> *@
-@*         <dd>@Html.DisplayFor(model => model.Description)</dd> *@
-@*     </dl> *@
-@* </div> *@
-@* *@
-@* <div> *@
-@*     <h1>Tasks</h1> *@
-@*     @foreach(var task in Model.Tasks) *@
-@*     { *@
-@*         <div> *@
-@*             <h4>@task?.Title</h4> *@
-@*             <p>@task?.Description</p> *@
-@*             <p>@task?.DueDateTime.Day</p> *@
-@*             <p>@task?.CreatedAt</p> *@
-@*         </div> *@
-@*     } *@
-@* </div> *@
-@* *@
-@* <a asp-action="Index" class="btn btn-secondary">Back to List</a> *@
+@model ToDoListResponse
+
+<div class="d-flex justify-content-center align-items-center mt-5">
+    <div>
+        <a asp-controller="Tasks" asp-action="Create" asp-route-toDoListId="@Model.Id" class="btn btn-primary mt-3 me-2">
+            <i class="fas fa-plus"></i> Create new Task
+        </a>
+
+        <a asp-controller="TodoList" asp-action="Index" asp-route-id="@Model.Id" class="btn btn-secondary mt-3">
+            <i class="fas fa-arrow-left"></i> Back to To-Do List
+        </a>
+    </div>
+</div>
+
+@if (Model.Tasks != null && Model.Tasks.Any())
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+        @foreach (var task in Model.Tasks)
+        {
+            string cardBackgroundColor = GetTaskBackgroundColor(task);
+
+            <div class="col">
+                <div class="card h-100" style="background-color: @cardBackgroundColor;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">@task.Title</h5>
+                        <div>
+                            <a asp-controller="Tasks" asp-action="Delete" asp-route-toDoListId="@Model.Id" asp-route-taskId="@task.Id"
+                               class="text-danger" title="Delete">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            <a asp-controller="Tasks" asp-action="Complete" asp-route-toDoListId="@Model.Id" asp-route-taskId="@task.Id"
+                               class="text-success ms-2" title="Complete">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            <div class="dropdown d-inline-block ms-2">
+                                <a class="text-secondary" href="#" role="button" id="dropdownMenuLink_@task.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink_@task.Id">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Tasks" asp-action="Edit" asp-route-toDoListId="@Model.Id" asp-route-taskId="@task.Id">
+                                            <i class="fas fa-edit me-2"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Tags" asp-action="AddTag" asp-route-taskId="@task.Id">
+                                            <i class="fas fa-plus me-2"></i> Add Tag
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>@task.Description</p>
+                        @if (task.Tags != null && task.Tags.Any())
+                        {
+                            var uniqueTags = task.Tags.DistinctBy(tag => tag.Name).ToList();
+                            if (uniqueTags.Any())
+                            {
+                                <ul>
+                                    @foreach (var tag in uniqueTags)
+                                    {
+                                        <li class="@GetTagCssClass(tag.Name!) text-black d-inline-block mr-2">
+                                            @tag.Name
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p>No tags found.</p>
+                            }
+                        }
+                        else
+                        {
+                            <p>No tags found.</p>
+                        }
+                    </div>
+                    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Status: @(task.IsComplete ? "Completed" : "Active")</small>
+                        <a href="@Url.Action("Get", "Tasks", new { toDoListId = @Model.Id, taskId = @task.Id })" class="text-info">
+                            <i class="fas fa-info-circle me-2"></i> Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No tasks found.</p>
+}
+
+@functions {
+    private static string GetTaskBackgroundColor(TaskResponse task)
+    {
+        if (task.IsComplete)
+        {
+            return "rgba(0, 255, 0, 0.5)";
+        }
+        else if (task.DueDateTime < DateTime.Now)
+        {
+            return "rgba(255, 0, 0, 0.5)"; // Red with 0.5 transparency
+        }
+        else
+        {
+            return "rgba(255, 255, 0, 0.5)"; // Yellow with 0.5 transparency
+        }
+    }
+
+    private static string GetTagCssClass(string tagName)
+    {
+        return tagName.ToLower() switch
+        {
+            "urgent" => "badge tag-urgent",
+            "high_priority" => "badge tag-high-priority",
+            "medium_priority" => "badge tag-medium-priority",
+            "low_priority" => "badge tag-low-priority",
+            "personal" => "badge tag-personal",
+            "work" => "badge tag-work",
+            "home" => "badge tag-home",
+            "health" => "badge tag-health",
+            _ => "badge badge-secondary" // Default class
+        };
+    }
+}

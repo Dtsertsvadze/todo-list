@@ -1,11 +1,10 @@
-﻿using Entities;
+﻿namespace Database;
+using Entities;
 using Microsoft.EntityFrameworkCore;
-
-namespace Database;
-
 public class ToDoListDbContext : DbContext
 {
-    public ToDoListDbContext(DbContextOptions<ToDoListDbContext> options) : base(options)
+    public ToDoListDbContext(DbContextOptions<ToDoListDbContext> options)
+        : base(options)
     {
     }
 
@@ -18,7 +17,6 @@ public class ToDoListDbContext : DbContext
     public DbSet<TagEntity> Tags { get; set; } = null!;
 
     public DbSet<TaskTag> TaskTags { get; set; }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,7 +33,7 @@ public class ToDoListDbContext : DbContext
             .HasForeignKey(c => c.TaskId);
 
         modelBuilder.Entity<TaskTag>()
-            .HasKey(ttm=> new { ttm.TaskId, ttm.TagId });
+            .HasKey(ttm => new { ttm.TaskId, ttm.TagId });
 
         modelBuilder.Entity<TaskTag>()
             .HasOne(ttm => ttm.Task)

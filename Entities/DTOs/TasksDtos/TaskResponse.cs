@@ -1,7 +1,6 @@
-using Entities.DTOs.CommentDtos;
-using Entities.DTOs.TagsDtos;
-
 namespace Entities.DTOs.TasksDtos;
+using CommentDtos;
+using TagsDtos;
 
 public class TaskResponse
 {
@@ -24,7 +23,6 @@ public class TaskResponse
     public List<TagResponse>? Tags { get; set; }
 }
 
-
 public static class TaskExtensions
 {
     public static TaskResponse ToTaskResponse(this TaskEntity task)
@@ -39,7 +37,7 @@ public static class TaskExtensions
             CreatedAt = task.CreatedAt,
             ToDoListId = task.ToDoListId,
             Comments = task.Comments?.Select(t => t.ToCommentResponse()).ToList(),
-            Tags = task.TaskTags?.Select(t => t.Tag.ToTagResponse()).ToList()
+            Tags = task.TaskTags?.Select(t => t.Tag !.ToTagResponse()).ToList(),
         };
     }
 }

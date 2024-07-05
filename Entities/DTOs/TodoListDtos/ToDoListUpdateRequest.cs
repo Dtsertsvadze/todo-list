@@ -1,7 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Entities.DTOs.TodoListDtos;
-
+using System.ComponentModel.DataAnnotations;
 public class ToDoListUpdateRequest
 {
     public Guid Id { get; set; }

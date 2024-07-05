@@ -1,20 +1,19 @@
+namespace Repositories;
 using Database;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
-namespace Repositories;
-
-public class ToDoListsRepository(ToDoListDbContext db) : IToDoListRepository
+public class ToDoListsRepository(ToDoListDbContext db)
+    : IToDoListRepository
 {
-
     public async Task<IEnumerable<ToDoListEntity?>> GetToDoListsAsync()
     {
         return await db.ToDoLists
-            .Include(t => t.Tasks)!
+            .Include(t => t.Tasks) !
             .ThenInclude(t => t.Comments)
-            .Include(t => t.Tasks)!
-            .ThenInclude(t => t.TaskTags)
+            .Include(t => t.Tasks) !
+            .ThenInclude(t => t.TaskTags) !
             .ThenInclude(tt => tt.Tag)
             .ToListAsync();
     }
@@ -22,10 +21,10 @@ public class ToDoListsRepository(ToDoListDbContext db) : IToDoListRepository
     public async Task<ToDoListEntity?> GetToDoListAsync(Guid toDoListId)
     {
         return await db.ToDoLists
-            .Include(t => t.Tasks)!
+            .Include(t => t.Tasks) !
             .ThenInclude(t => t.Comments)
-            .Include(t => t.Tasks)!
-            .ThenInclude(t => t.TaskTags)
+            .Include(t => t.Tasks) !
+            .ThenInclude(t => t.TaskTags) !
             .ThenInclude(tt => tt.Tag)
             .FirstOrDefaultAsync(temp => temp.Id == toDoListId);
     }
@@ -41,7 +40,7 @@ public class ToDoListsRepository(ToDoListDbContext db) : IToDoListRepository
     public async Task<ToDoListEntity> UpdateToDoListAsync(ToDoListEntity toDoListEntity)
     {
         var matchingToDoList = db.ToDoLists
-            .Include(t => t.Tasks)!
+            .Include(t => t.Tasks) !
             .ThenInclude(t => t.Comments)
             .FirstOrDefault(temp => temp.Id == toDoListEntity.Id);
 

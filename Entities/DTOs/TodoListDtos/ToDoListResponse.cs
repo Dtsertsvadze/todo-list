@@ -1,7 +1,5 @@
-using Entities.DTOs.CommentDtos;
-using Entities.DTOs.TasksDtos;
-
 namespace Entities.DTOs.TodoListDtos;
+using TasksDtos;
 
 public class ToDoListResponse
 {

@@ -1,6 +1,5 @@
-using Entities.DTOs.TagsDtos;
-
 namespace ServiceContracts;
+using Entities.DTOs.TagsDtos;
 
 public interface ITagsService
 {

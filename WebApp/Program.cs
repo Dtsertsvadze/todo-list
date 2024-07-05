@@ -1,10 +1,23 @@
-using Services.WebApi;
+#pragma warning disable SA1200
 
+using Services.WebApi;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient<ToDoListWebApiService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5130");
+});
+builder.Services.AddHttpClient<AccountWebApiService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5130");
+});
+builder.Services.AddHttpClient<TasksWebApiService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5130");
+});
+builder.Services.AddHttpClient<TagsWebApiService>(client =>
 {
     client.BaseAddress = new Uri("http://localhost:5130");
 });
@@ -23,6 +36,11 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.MapControllerRoute(
     name: "default",

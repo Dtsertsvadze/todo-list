@@ -1,7 +1,5 @@
-using Entities;
-
 namespace RepositoryContracts;
-
+using Entities;
 public interface ICommentRepository
 {
     public Task<CommentEntity> AddCommentAsync(Guid taskId, CommentEntity comment);

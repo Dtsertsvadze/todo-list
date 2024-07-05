@@ -1,31 +1,47 @@
 ﻿@model IEnumerable<ToDoListResponse>
+@{
+    ViewData["Title"] = "To-Do Lists";
+}
 
-<h2>To-Do Lists</h2>
-<h4>
-    <a href="~/todolist/create">Create Todo List</a>
-</h4>
-<table class="table">
-    <thead>
-    <tr>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Tasks</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
+<p class="mt-5 text-center">
+    <a href="@Url.Action("Create")" class="btn btn-success">Create New To Do List</a>
+</p>
+
+<div class="row">
     @foreach (var todoList in Model)
     {
-        <tr>
-            <td>@todoList.Title</td>
-            <td>@todoList.Description</td>
-            <td>@(todoList.Tasks?.Count == 0 ? "No Tasks" : todoList.Tasks?.Count.ToString())</td>
-            <td>
-                <a href="~/todolist/get/@todoList.Id">View</a>
-                <a href="~/todolist/edit/@todoList.Id">Edit</a>
-                <a href="~/todolist/delete/@todoList.Id">Delete</a>
-            </td>
-        </tr>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">@todoList.Title</h5>
+                        <div class="dropdown">
+                            <a class="text-secondary" href="#" role="button" id="dropdownMenuLink_@todoList.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink_@todoList.Id">
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("Edit", new { id = todoList.Id })">
+                                        <i class="fas fa-edit me-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="@Url.Action("Delete", new { id = todoList.Id })">
+                                        <i class="fas fa-trash-alt me-2"></i> Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="card-text">@todoList.Description</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="card-text"><small class="text-muted">Tasks: @todoList.Tasks?.Count</small></p>
+                        <a href="@Url.Action("Get", new { id = todoList.Id })" class="text-info">
+                            <i class="fas fa-info-circle me-2"></i> Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
-    </tbody>
-</table>
+</div>

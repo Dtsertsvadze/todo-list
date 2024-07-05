@@ -1,6 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Entities.DTOs.TodoListDtos;
+using System.ComponentModel.DataAnnotations;
 
 public class ToDoListAddRequest
 {
@@ -23,7 +22,7 @@ public class ToDoListAddRequest
             Title = this.Title,
             Description = this.Description,
             IsComplete = this.IsComplete,
-            CreatedAt = this.CreatedAt
+            CreatedAt = this.CreatedAt,
         };
     }
 }

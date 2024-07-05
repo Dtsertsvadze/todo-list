@@ -1,3 +1,5 @@
+#pragma warning disable SA1200
+
 using Entities.DTOs.CommentDtos;
 using Microsoft.AspNetCore.Mvc;
 using ServiceContracts;
@@ -58,22 +60,22 @@ public class CommentsController : ControllerBase
 
         if (comment == null)
         {
-            return NotFound();
+            return this.NotFound();
         }
 
         try
         {
             commentUpdateRequest.Id = commentId;
             var updatedComment = await this._commentService.UpdateCommentAsync(commentUpdateRequest);
-            return Ok(updatedComment);
+            return this.Ok(updatedComment);
         }
         catch (NullReferenceException ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return this.StatusCode(500, $"Internal server error: {ex.Message}");
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return this.BadRequest(ex.Message);
         }
     }
 
@@ -83,15 +85,15 @@ public class CommentsController : ControllerBase
         try
         {
             await this._commentService.DeleteCommentAsync(commentId);
-            return Ok();
+            return this.Ok();
         }
         catch (NullReferenceException ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return this.StatusCode(500, $"Internal server error: {ex.Message}");
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return this.BadRequest(ex.Message);
         }
     }
 }

@@ -1,20 +1,17 @@
-﻿using Database;
+﻿namespace Repositories;
+using Database;
 using Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using RepositoryContracts;
 
-namespace Repositories;
-
-public class TasksRepository(ToDoListDbContext db, ILogger<TasksRepository> logger) : ITasksRepository
+public class TasksRepository(ToDoListDbContext db)
+    : ITasksRepository
 {
-    private readonly ILogger<TasksRepository> _logger = logger;
-
     public async Task<IEnumerable<TaskEntity>> GetTasks(Guid toDoListId)
     {
         var result = await db.Tasks
             .Include(t => t.Comments)
-            .Include(t => t.TaskTags)
+            .Include(t => t.TaskTags) !
             .ThenInclude(t => t.Tag)
             .Where(t => t.ToDoListId == toDoListId).ToListAsync();
 
@@ -25,15 +22,15 @@ public class TasksRepository(ToDoListDbContext db, ILogger<TasksRepository> logg
     {
         return await db.Tasks
             .Include(t => t.Comments)
-            .Include(t => t.TaskTags)
+            .Include(t => t.TaskTags) !
             .ThenInclude(t => t.Tag)
             .FirstOrDefaultAsync(t => t.Id == taskId);
     }
 
-    public async Task<TaskEntity> AddTask(Guid toDoListId,TaskEntity task)
+    public async Task<TaskEntity> AddTask(Guid toDoListId, TaskEntity task)
     {
         var todoList = await db.ToDoLists
-            .Include(l => l.Tasks)!
+            .Include(l => l.Tasks)
             .FirstOrDefaultAsync(temp => temp.Id == toDoListId);
 
         if (todoList is null)
@@ -71,5 +68,17 @@ public class TasksRepository(ToDoListDbContext db, ILogger<TasksRepository> logg
         var rowsDeleted = await db.SaveChangesAsync();
 
         return rowsDeleted > 0;
+    }
+
+    public async Task<bool> CompleteTask(TaskEntity taskEntity)
+    {
+        var matchingTask = await db.Tasks.FirstOrDefaultAsync(temp => temp.Id == taskEntity.Id);
+
+        if (matchingTask is null)
+        {
+            return false;
+        }
+
+        return await db.SaveChangesAsync() > 0;
     }
 }

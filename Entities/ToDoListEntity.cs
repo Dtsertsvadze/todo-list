@@ -1,7 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Entities;
-
+﻿namespace Entities;
+using System.ComponentModel.DataAnnotations;
 public class ToDoListEntity
 {
     [Key]

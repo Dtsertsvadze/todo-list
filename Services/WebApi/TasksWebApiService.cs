@@ -1,74 +1,84 @@
+namespace Services.WebApi;
 using System.Net.Http.Json;
-using Entities.DTOs;
 using Entities.DTOs.TasksDtos;
 
-namespace Services.WebApi;
-
-public class TasksWebApiService
+public class TasksWebApiService(HttpClient httpClient)
 {
-    private readonly HttpClient _httpClient;
+    public async Task<ICollection<TaskResponse>> GetTasksAsync(Guid toDoListId)
+    {
+        var response = await httpClient.GetAsync($"/api/todolist/{toDoListId}/tasks");
 
-        public TasksWebApiService(HttpClient httpClient)
-        {
-            this._httpClient = httpClient;
-        }
+        response.EnsureSuccessStatusCode();
 
-        public async Task<ICollection<TaskResponse>> GetTasksAsync(Guid toDoListId)
-        {
-            var response = await this._httpClient.GetAsync($"/api/todolist/{toDoListId}/tasks");
+        var tasks = await response.Content.ReadFromJsonAsync<ICollection<TaskResponse>>();
 
-            response.EnsureSuccessStatusCode();
+        ArgumentNullException.ThrowIfNull(tasks, nameof(tasks));
 
-            var tasks = await response.Content.ReadFromJsonAsync<ICollection<TaskResponse>>();
+        return tasks;
+    }
 
-            ArgumentNullException.ThrowIfNull(tasks, nameof(tasks));
+    public async Task<TaskResponse?> GetTaskByIdAsync(Guid taskId)
+    {
+        var response = await httpClient.GetAsync($"/api/todolist/{taskId}");
 
-            return tasks;
-        }
+        response.EnsureSuccessStatusCode();
 
-        public async Task<TaskResponse> GetTaskAsync(Guid toDoListId, Guid taskId)
-        {
-            var response = await this._httpClient.GetAsync($"/api/todolist/{toDoListId}/tasks/{taskId}");
+        var task = await response.Content.ReadFromJsonAsync<TaskResponse>();
 
-            response.EnsureSuccessStatusCode();
+        return task;
+    }
 
-            var task = await response.Content.ReadFromJsonAsync<TaskResponse>();
+    public async Task<TaskResponse> GetTaskAsync(Guid toDoListId, Guid taskId)
+    {
+        var response = await httpClient.GetAsync($"/api/todolist/{toDoListId}/tasks/{taskId}");
 
-            ArgumentNullException.ThrowIfNull(task, nameof(task));
+        response.EnsureSuccessStatusCode();
 
-            return task;
-        }
+        var task = await response.Content.ReadFromJsonAsync<TaskResponse>();
 
-        public async Task<TaskResponse> CreateTaskAsync(TaskAddRequest taskAddRequest, Guid toDoListId)
-        {
-            var response = await this._httpClient.PostAsJsonAsync($"/api/todolist/{toDoListId}/tasks", taskAddRequest);
+        ArgumentNullException.ThrowIfNull(task, nameof(task));
 
-            response.EnsureSuccessStatusCode();
+        return task;
+    }
 
-            var createdTask = await response.Content.ReadFromJsonAsync<TaskResponse>();
+    public async Task<TaskResponse> CreateTaskAsync(TaskAddRequest taskAddRequest, Guid toDoListId)
+    {
+        var response = await httpClient.PostAsJsonAsync($"/api/todolist/{toDoListId}/tasks", taskAddRequest);
 
-            ArgumentNullException.ThrowIfNull(createdTask, nameof(createdTask));
+        response.EnsureSuccessStatusCode();
 
-            return createdTask;
-        }
+        var createdTask = await response.Content.ReadFromJsonAsync<TaskResponse>();
 
-        public async Task<TaskResponse> UpdateTaskAsync(Guid toDoListId, Guid taskId, TaskUpdateRequest taskUpdateRequest)
-        {
-            var response = await this._httpClient.PutAsJsonAsync($"/api/todolist/{toDoListId}/tasks/{taskId}", taskUpdateRequest);
+        ArgumentNullException.ThrowIfNull(createdTask, nameof(createdTask));
 
-            response.EnsureSuccessStatusCode();
+        return createdTask;
+    }
 
-            var updatedTask = await response.Content.ReadFromJsonAsync<TaskResponse>();
+    public async Task<TaskResponse> UpdateTaskAsync(Guid toDoListId, Guid taskId, TaskUpdateRequest taskUpdateRequest)
+    {
+        var response =
+            await httpClient.PutAsJsonAsync($"/api/todolist/{toDoListId}/tasks/{taskId}", taskUpdateRequest);
 
-            ArgumentNullException.ThrowIfNull(updatedTask, nameof(updatedTask));
+        response.EnsureSuccessStatusCode();
 
-            return updatedTask;
-        }
+        var updatedTask = await response.Content.ReadFromJsonAsync<TaskResponse>();
 
-        public async Task DeleteTaskAsync(Guid toDoListId, Guid taskId)
-        {
-            var response = await this._httpClient.DeleteAsync($"/api/todolist/{toDoListId}/tasks/{taskId}");
+        ArgumentNullException.ThrowIfNull(updatedTask, nameof(updatedTask));
 
-            response.EnsureSuccessStatusCode();
-        }
+        return updatedTask;
+    }
+
+    public async Task DeleteTaskAsync(Guid toDoListId, Guid taskId)
+    {
+        var response = await httpClient.DeleteAsync($"/api/todolist/{toDoListId}/tasks/{taskId}");
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task CompleteTaskAsync(Guid toDoListId, Guid taskId)
+    {
+        var response = await httpClient.PutAsync($"/api/todolist/{toDoListId}/tasks/{taskId}/complete", null);
+
+        response.EnsureSuccessStatusCode();
+    }
 }

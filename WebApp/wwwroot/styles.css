@@ -39,3 +39,24 @@
 .table tbody tr a:hover {
     color: #00564d;
 }
+
+.tag-urgent { background-color: red; color: white; padding: 2px 4px; border-radius: 4px; }
+.tag-high-priority { background-color: orange; color: white; padding: 2px 4px; border-radius: 4px; }
+.tag-medium-priority { background-color: yellow; color: black; padding: 2px 4px; border-radius: 4px; }
+.tag-low-priority { background-color: green; color: white; padding: 2px 4px; border-radius: 4px; }
+.tag-personal { background-color: purple; color: white; padding: 2px 4px; border-radius: 4px; }
+.tag-work { background-color: blue; color: white; padding: 2px 4px; border-radius: 4px; }
+.tag-home { background-color: #b02a37; color: white; padding: 2px 4px; border-radius: 4px; }
+.tag-health { background-color: teal; color: white; padding: 2px 4px; border-radius: 4px; }
+
+.card-overdue {
+    background-color: rgba(255, 0, 0, 0.5); /* Red with 0.5 transparency */
+}
+
+.card-completed {
+    background-color: rgba(0, 255, 0, 0.5); /* Green with 0.5 transparency */
+}
+
+.card-active {
+    background-color: rgba(255, 255, 0, 0.5); /* Yellow with 0.5 transparency */
+}

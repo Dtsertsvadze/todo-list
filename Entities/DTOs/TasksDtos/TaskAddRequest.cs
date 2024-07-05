@@ -1,8 +1,6 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Entities.DTOs.TasksDtos;
-
+using System.ComponentModel.DataAnnotations;
+using TagsDtos;
 public class TaskAddRequest
 {
     [Required(ErrorMessage = "Title is required.")]
@@ -16,9 +14,9 @@ public class TaskAddRequest
 
     public bool IsComplete { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
     public Guid ToDoListId { get; set; }
+
+    public List<TagResponse> Tags { get; set; } = new ();
 
     public TaskEntity ToTaskEntity()
     {
@@ -28,8 +26,9 @@ public class TaskAddRequest
             Description = this.Description,
             DueDateTime = this.DueDateTime,
             IsComplete = this.IsComplete,
-            CreatedAt = this.CreatedAt,
+            CreatedAt = DateTime.UtcNow,
             ToDoListId = this.ToDoListId,
+            TaskTags = this.Tags.Select(t => new TaskTag { TagId = t.Id }).ToList(),
         };
     }
 }

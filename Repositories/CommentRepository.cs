@@ -1,13 +1,12 @@
+namespace Repositories;
 using Database;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
-namespace Repositories;
-
-public class CommentRepository(ToDoListDbContext db) : ICommentRepository
+public class CommentRepository(ToDoListDbContext db)
+    : ICommentRepository
 {
-
     public async Task<CommentEntity> AddCommentAsync(Guid taskId, CommentEntity comment)
     {
         await db.Comments.AddAsync(comment);

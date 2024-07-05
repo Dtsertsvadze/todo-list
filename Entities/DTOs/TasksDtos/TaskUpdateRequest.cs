@@ -16,8 +16,6 @@ public class TaskUpdateRequest
 
     public bool IsComplete { get; set; }
 
-
-
     public TaskEntity ToTaskEntity()
     {
         return new TaskEntity()
@@ -25,6 +23,20 @@ public class TaskUpdateRequest
             Id = this.Id,
             Title = this.Title,
             Description = this.Description,
+        };
+    }
+
+    public TaskResponse ToTaskResponse()
+    {
+        return new TaskResponse()
+        {
+            Id = this.Id,
+            Title = this.Title,
+            Description = this.Description,
+            ToDoListId = this.ToDoListId,
+            DueDateTime = this.DueDateTime,
+            CreatedAt = this.CreatedAt,
+            IsComplete = this.IsComplete,
         };
     }
 }

@@ -1,33 +1,75 @@
-@* @model ToDoListResponse *@
-@* *@
-@* <h2>Task Details</h2> *@
-@* *@
-@* <div> *@
-@*     <h4>Task</h4> *@
-@*     <hr /> *@
-@*     <dl class="row"> *@
-@*         <dt class="col-sm-2"> *@
-@*             @Html.DisplayNameFor(model => model.Title) *@
-@*         </dt> *@
-@*         <dd class="col-sm-10"> *@
-@*             @Html.DisplayFor(model => model.Title) *@
-@*         </dd> *@
-@*         <dt class="col-sm-2"> *@
-@*             @Html.DisplayNameFor(model => model.Description) *@
-@*         </dt> *@
-@*         <dd class="col-sm-10"> *@
-@*             @Html.DisplayFor(model => model.Description) *@
-@*         </dd> *@
-@*         <dt class="col-sm-2"> *@
-@*             @Html.DisplayNameFor(model => model.DueDateTime) *@
-@*         </dt> *@
-@*         <dd class="col-sm-10"> *@
-@*             @Html.DisplayFor(model => model.DueDateTime) *@
-@*         </dd> *@
-@*     </dl> *@
-@* </div> *@
-@* <p> *@
-@*     <a href="~/tasks/edit/@Model.Id">Edit</a> | *@
-@*     <a href="~/tasks/delete/@Model.Id">Delete</a> | *@
-@*     <a href="~/tasks">Back to List</a> *@
-@* </p> *@
+@model TaskResponse
+
+<div class="card mt-3">
+    <div class="card-header">
+        Task Details
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">@Model.Title</h5>
+        <p class="card-text">@Model.Description</p>
+        <p class="card-text"><strong>Creation Date:</strong> @Model.CreatedAt.ToString("dd MMM yyyy")</p>
+        <p class="card-text">
+            <strong>Due Date:</strong>
+            @if (Model.IsComplete)
+            {
+                <span class="text-success">@Model.DueDateTime.ToString("dd MMM yyyy")</span>
+            }
+            else
+            {
+                @Model.DueDateTime.ToString("dd MMM yyyy")
+            }
+        </p>
+        @if (!Model.IsComplete)
+        {
+            <p class="card-text">
+                <strong>Time Left:</strong>
+                @if (Model.DueDateTime > DateTime.Now)
+                {
+                    var timeLeft = Model.DueDateTime - DateTime.Now;
+                    <span>@timeLeft.Hours hours, @timeLeft.Minutes minutes left</span>
+                }
+                else
+                {
+                    <span class="text-danger">Time's up!</span>
+                }
+            </p>
+        }
+        <p class="card-text">
+            <strong>Status:</strong>
+            <span class="badge @(Model.IsComplete ? "bg-success" : "bg-warning text-dark")">
+                @(Model.IsComplete ? "Completed" : "Active")
+            </span>
+        </p>
+        @if (Model.Tags != null && Model.Tags.Any())
+        {
+            <p class="card-text">
+                <strong>Tags:</strong>
+                @foreach (var tag in Model.Tags)
+                {
+                    <span class="@GetTagCssClass(tag.Name!)">@tag.Name</span>
+                }
+            </p>
+        }
+    </div>
+    <div class="card-footer">
+        <a asp-controller="TodoList" asp-action="Get" asp-route-id="@Model.ToDoListId" class="btn btn-primary">Back to To-Do List</a>
+    </div>
+</div>
+
+@functions {
+    private static string GetTagCssClass(string tagName)
+    {
+        return tagName.ToLower() switch
+        {
+            "urgent" => "badge tag-urgent",
+            "high_priority" => "badge tag-high-priority",
+            "medium_priority" => "badge tag-medium-priority",
+            "low_priority" => "badge tag-low-priority",
+            "personal" => "badge tag-personal",
+            "work" => "badge tag-work",
+            "home" => "badge tag-home",
+            "health" => "badge tag-health",
+            _ => "badge badge-secondary" // Default class
+            };
+    }
+}

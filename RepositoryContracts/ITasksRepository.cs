@@ -1,6 +1,5 @@
-﻿using Entities;
-
-namespace RepositoryContracts;
+﻿namespace RepositoryContracts;
+using Entities;
 
 public interface ITasksRepository
 {
@@ -13,4 +12,6 @@ public interface ITasksRepository
     Task<TaskEntity> UpdateTask(TaskEntity task);
 
     Task<bool> DeleteTask(Guid taskId);
+
+    Task<bool> CompleteTask(TaskEntity taskEntity);
 }

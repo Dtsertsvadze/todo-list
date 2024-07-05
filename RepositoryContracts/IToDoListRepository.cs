@@ -1,7 +1,5 @@
-using Entities;
-
 namespace RepositoryContracts;
-
+using Entities;
 public interface IToDoListRepository
 {
     Task<IEnumerable<ToDoListEntity?>> GetToDoListsAsync();

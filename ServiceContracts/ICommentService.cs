@@ -1,7 +1,5 @@
-using Entities.DTOs.CommentDtos;
-
 namespace ServiceContracts;
-
+using Entities.DTOs.CommentDtos;
 public interface ICommentService
 {
     public Task<CommentResponse> AddCommentAsync(Guid taskId, CommentAddRequest commentAddRequest);

@@ -1,11 +1,10 @@
+namespace WebAPI.Controllers;
 using Entities.DTOs.TasksDtos;
 using Microsoft.AspNetCore.Mvc;
 using ServiceContracts;
 
-namespace WebAPI.Controllers;
-
 [ApiController]
-[Route("api/todolist/{toDoListId}/[controller]")]
+[Route("api/todolist/")]
 public class TasksController : ControllerBase
 {
     private readonly ITasksService _tasksService;
@@ -15,15 +14,15 @@ public class TasksController : ControllerBase
         this._tasksService = tasksService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetTasks(Guid toDoListId)
+    [HttpGet("{toDoListId}/Tasks/{taskId}")]
+    public async Task<IActionResult> GetTasks(Guid toDoListId, Guid taskId)
     {
-        var tasks = await this._tasksService.GetTasksAsync(toDoListId);
-        return Ok(tasks);
+        var task = await this._tasksService.GetTaskAsync(taskId);
+        return Ok(task);
     }
 
     [HttpGet("{taskId}")]
-    public async Task<IActionResult> GetTask(Guid toDoListId, Guid taskId)
+    public async Task<IActionResult> GetTask(Guid taskId)
     {
         try
         {
@@ -32,6 +31,7 @@ public class TasksController : ControllerBase
             {
                 return NotFound();
             }
+
             return Ok(task);
         }
         catch (ArgumentException ex)
@@ -40,7 +40,7 @@ public class TasksController : ControllerBase
         }
     }
 
-    [HttpPost]
+    [HttpPost("{toDoListId}/Tasks")]
     public async Task<IActionResult> CreateTaskAsync([FromBody] TaskAddRequest taskAddRequest, Guid toDoListId)
     {
         var createdTask = await this._tasksService.CreateTaskAsync(taskAddRequest, toDoListId);
@@ -48,23 +48,35 @@ public class TasksController : ControllerBase
         return CreatedAtAction(nameof(this.GetTask), new { toDoListId, taskId = createdTask?.Id }, createdTask);
     }
 
-    [HttpPut("{taskId}")]
+    [HttpPut("{toDoListId}/Tasks/{taskId}")]
     public async Task<IActionResult> UpdateTaskAsync(Guid toDoListId, Guid taskId, [FromBody] TaskUpdateRequest taskUpdateRequest)
     {
         var updatedTask = await this._tasksService.UpdateTaskAsync(taskId, taskUpdateRequest);
 
-        return Ok(updatedTask);
+        return this.Ok(updatedTask);
     }
 
-    [HttpDelete("{taskId}")]
+    [HttpDelete("{toDoListId}/Tasks/{taskId}")]
     public async Task<IActionResult> DeleteTaskAsync(Guid toDoListId, Guid taskId)
     {
         var success = await this._tasksService.DeleteTaskAsync(taskId);
         if (!success)
         {
-            return NotFound();
+            return this.NotFound();
         }
 
-        return NoContent();
+        return this.NoContent();
+    }
+
+    [HttpPut("{toDoListId}/Tasks/{taskId}/complete")]
+    public async Task<IActionResult> CompleteTaskAsync(Guid toDoListId, Guid taskId)
+    {
+        var success = await this._tasksService.CompleteTaskAsync(taskId);
+        if (!success)
+        {
+            return this.NotFound();
+        }
+
+        return this.NoContent();
     }
 }

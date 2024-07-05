@@ -1,6 +1,5 @@
-using Entities;
-
 namespace RepositoryContracts;
+using Entities;
 
 public interface ITagsRepository
 {
@@ -11,5 +10,4 @@ public interface ITagsRepository
     public Task<TagEntity> UpdateTagAsync(TagEntity tagEntity);
 
     public Task<bool> DeleteTagAsync(Guid tagId);
-
 }

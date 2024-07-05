@@ -1,27 +1,13 @@
-﻿using Database;
-using Entities;
+﻿namespace Services;
 using Entities.DTOs.TodoListDtos;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using RepositoryContracts;
 using ServiceContracts;
-
-namespace Services;
-
-public class ToDoListService : IToDoListService
+public class ToDoListService(IToDoListRepository toDoListRepository)
+    : IToDoListService
 {
-    private readonly IToDoListRepository _toDoListRepository;
-    private readonly ILogger<ToDoListService> _logger;
-
-    public ToDoListService(IToDoListRepository toDoListRepository, ILogger<ToDoListService> logger)
-    {
-        this._toDoListRepository = toDoListRepository;
-        this._logger = logger;
-    }
-
     public async Task<List<ToDoListResponse?>> GetToDoListsAsync()
     {
-        var toDoLists = await this._toDoListRepository.GetToDoListsAsync();
+        var toDoLists = await toDoListRepository.GetToDoListsAsync();
 
         return toDoLists.Select(temp => temp?.ToToDoListResponse()).ToList();
     }
@@ -30,7 +16,7 @@ public class ToDoListService : IToDoListService
     {
         ArgumentNullException.ThrowIfNull(toDoListId, nameof(toDoListId));
 
-        var result = await this._toDoListRepository.GetToDoListAsync(toDoListId);
+        var result = await toDoListRepository.GetToDoListAsync(toDoListId);
 
         ArgumentNullException.ThrowIfNull(result, nameof(result));
 
@@ -45,26 +31,25 @@ public class ToDoListService : IToDoListService
         toDoList.CreatedAt = DateTime.UtcNow;
         toDoList.IsComplete = false;
 
-        var toDoListResponse = await this._toDoListRepository.CreateToDoListAsync(toDoList);
+        var toDoListResponse = await toDoListRepository.CreateToDoListAsync(toDoList);
 
         ArgumentNullException.ThrowIfNull(toDoListResponse, nameof(toDoListResponse));
 
         return toDoListResponse.ToToDoListResponse();
     }
 
-
     public async Task<ToDoListResponse?> UpdateToDoListAsync(ToDoListUpdateRequest toDoListUpdateRequest)
     {
         ArgumentNullException.ThrowIfNull(toDoListUpdateRequest, nameof(toDoListUpdateRequest));
 
-        var existingToDoList = await this._toDoListRepository.GetToDoListAsync(toDoListUpdateRequest.Id);
+        var existingToDoList = await toDoListRepository.GetToDoListAsync(toDoListUpdateRequest.Id);
 
         ArgumentNullException.ThrowIfNull(existingToDoList, nameof(existingToDoList));
 
         existingToDoList.Title = toDoListUpdateRequest.Title;
         existingToDoList.Description = toDoListUpdateRequest.Description;
 
-        var result = await this._toDoListRepository.UpdateToDoListAsync(existingToDoList);
+        var result = await toDoListRepository.UpdateToDoListAsync(existingToDoList);
 
         ArgumentNullException.ThrowIfNull(result, nameof(result));
 
@@ -73,6 +58,6 @@ public class ToDoListService : IToDoListService
 
     public async Task<bool> DeleteToDoListAsync(Guid toDoListId)
     {
-        return await this._toDoListRepository.DeleteToDoListAsync(toDoListId);
+        return await toDoListRepository.DeleteToDoListAsync(toDoListId);
     }
 }

@@ -5,18 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - WebApp</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/styles.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    @RenderSection("Styles", required: false)
 </head>
 <body>
-<div class="container">
+
+@{
+    var isLoggedIn = Context.Request.Cookies.ContainsKey("jwtToken");
+}
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-controller="TodoList" asp-action="Index">
+            <i class="fas fa-list-check"></i> TodoList
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+            <ul class="navbar-nav mx-auto gap-3">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Assigned Tasks</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Search</a>
+                </li>
+            </ul>
+            @if (isLoggedIn)
+            {
+                <form class="d-flex" method="post" asp-controller="Account" asp-action="Logout">
+                    <button class="btn btn-outline-danger" type="submit">Logout</button>
+                </form>
+            }
+            else
+            {
+                <form class="d-flex" method="get" asp-controller="Account" asp-action="Register">
+                    <button class="btn btn-outline-primary" type="submit">Register</button>
+                </form>
+            }
+        </div>
+    </div>
+</nav>
+<div class="container mb-5">
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
 </div>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<footer class="footer py-3 bg-light fixed-bottom">
+    <div class="container ">
+        <span class="text-muted">Place sticky footer content here.</span>
+    </div>
+</footer>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

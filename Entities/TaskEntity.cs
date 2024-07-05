@@ -1,7 +1,6 @@
+namespace Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Entities;
 
 public class TaskEntity
 {
@@ -23,11 +22,10 @@ public class TaskEntity
 
     public ICollection<CommentEntity>? Comments { get; set; }
 
-    public ICollection<TaskTag> TaskTags { get; set; }
+    public ICollection<TaskTag>? TaskTags { get; set; }
 
     public Guid ToDoListId { get; set; }
 
     [ForeignKey("ToDoListId")]
     public ToDoListEntity? ToDoList { get; set; }
 }
-

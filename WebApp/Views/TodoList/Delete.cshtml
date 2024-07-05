@@ -1,20 +1,25 @@
 @model ToDoListResponse
 
-<h2>Delete To-Do List</h2>
+<h2 class="text-center mt-4">Delete To-Do List</h2>
 
-<p>Are you sure you want to delete the following to-do list?</p>
-
-<div>
-    <dl>
-        <dt>@Html.DisplayNameFor(model => model.Title)</dt>
-        <dd>@Html.DisplayFor(model => model.Title)</dd>
-        <dt>@Html.DisplayNameFor(model => model.Description)</dt>
-        <dd>@Html.DisplayFor(model => model.Description)</dd>
-    </dl>
+<div class="card my-5">
+    <div class="card-header">
+        Confirm Deletion
+    </div>
+    <div class="card-body">
+        <p>Are you sure you want to delete the following to-do list?</p>
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Title)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Title)</dd>
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <form asp-action="Delete" method="post" class="d-inline">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>

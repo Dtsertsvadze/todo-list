@@ -1,20 +1,11 @@
+namespace Services.WebApi;
 using System.Net.Http.Json;
 using Entities.DTOs.CommentDtos;
-
-namespace Services.WebApi;
-
-public class CommentsWebApiService
+public class CommentsWebApiService(HttpClient httpClient)
 {
-    private readonly HttpClient _httpClient;
-
-    public CommentsWebApiService(HttpClient httpClient)
-    {
-        this._httpClient = httpClient;
-    }
-
     public async Task<bool> AddCommentAsync(Guid taskId, CommentAddRequest commentAddRequest)
     {
-        var response = await this._httpClient.PostAsJsonAsync($"/api/tasks/{taskId}/comments", commentAddRequest);
+        var response = await httpClient.PostAsJsonAsync($"/api/tasks/{taskId}/comments", commentAddRequest);
 
         response.EnsureSuccessStatusCode();
 
@@ -23,7 +14,7 @@ public class CommentsWebApiService
 
     public async Task<List<CommentResponse>> GetCommentsForTask(Guid taskId)
     {
-        var response = await this._httpClient.GetAsync($"/api/comments/{taskId}/GetCommentsForTask");
+        var response = await httpClient.GetAsync($"/api/comments/{taskId}/GetCommentsForTask");
 
         response.EnsureSuccessStatusCode();
 
@@ -34,7 +25,7 @@ public class CommentsWebApiService
 
     public async Task<CommentResponse?> UpdateCommentAsync(CommentUpdateRequest commentUpdateRequest, Guid commentId)
     {
-        var response = await this._httpClient.PutAsJsonAsync($"/api/comments/{commentId}/UpdateComment", commentUpdateRequest);
+        var response = await httpClient.PutAsJsonAsync($"/api/comments/{commentId}/UpdateComment", commentUpdateRequest);
 
         response.EnsureSuccessStatusCode();
 
@@ -45,7 +36,7 @@ public class CommentsWebApiService
 
     public async Task DeleteComment(Guid commentId)
     {
-        var response = await this._httpClient.DeleteAsync($"/api/comments/{commentId}/DeleteComment");
+        var response = await httpClient.DeleteAsync($"/api/comments/{commentId}/DeleteComment");
         response.EnsureSuccessStatusCode();
     }
 }

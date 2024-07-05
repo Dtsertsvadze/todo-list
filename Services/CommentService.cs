@@ -1,18 +1,11 @@
+namespace Services;
 using Entities.DTOs.CommentDtos;
 using RepositoryContracts;
 using ServiceContracts;
 
-namespace Services;
-
-public class CommentService : ICommentService
+public class CommentService(ICommentRepository commentRepository)
+    : ICommentService
 {
-    private readonly ICommentRepository _commentRepository;
-
-    public CommentService(ICommentRepository commentRepository)
-    {
-        this._commentRepository = commentRepository;
-    }
-
     public async Task<CommentResponse> AddCommentAsync(Guid taskId, CommentAddRequest commentAddRequest)
     {
         var commentEntity = commentAddRequest.ToCommentEntity();
@@ -20,21 +13,21 @@ public class CommentService : ICommentService
         commentEntity.Id = Guid.NewGuid();
         commentEntity.TaskId = taskId;
 
-        var addedComment = await this._commentRepository.AddCommentAsync(taskId, commentEntity);
+        var addedComment = await commentRepository.AddCommentAsync(taskId, commentEntity);
 
         return addedComment.ToCommentResponse();
     }
 
     public async Task<CommentResponse?> GetCommentByIdAsync(Guid id)
     {
-        var comment = await this._commentRepository.GetCommentByIdAsync(id);
+        var comment = await commentRepository.GetCommentByIdAsync(id);
 
         return comment?.ToCommentResponse();
     }
 
     public async Task<List<CommentResponse>> GetCommentsByTaskIdAsync(Guid taskId)
     {
-        var comments = await this._commentRepository.GetCommentsByTaskIdAsync(taskId);
+        var comments = await commentRepository.GetCommentsByTaskIdAsync(taskId);
 
         return comments.Select(c => c.ToCommentResponse()).ToList();
     }
@@ -47,14 +40,14 @@ public class CommentService : ICommentService
 
         var commentEntity = commentUpdateRequest.ToCommentEntity();
 
-        var updatedComment = await this._commentRepository.UpdateCommentAsync(commentEntity);
+        var updatedComment = await commentRepository.UpdateCommentAsync(commentEntity);
 
         return updatedComment.ToCommentResponse();
     }
 
     public async Task<bool> DeleteCommentAsync(Guid id)
     {
-        var deletedComment = await this._commentRepository.DeleteCommentAsync(id);
+        var deletedComment = await commentRepository.DeleteCommentAsync(id);
 
         return deletedComment;
     }

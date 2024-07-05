@@ -1,8 +1,7 @@
+namespace WebAPI.Controllers;
 using Entities.DTOs.TagsDtos;
 using Microsoft.AspNetCore.Mvc;
 using ServiceContracts;
-
-namespace WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -75,15 +74,15 @@ public class TagsController : ControllerBase
         try
         {
             var result = await this._tagsService.DeleteTagAsync(tagId);
-            return Ok(result);
+            return this.Ok(result);
         }
         catch (NullReferenceException ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return this.StatusCode(500, $"Internal server error: {ex.Message}");
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return this.BadRequest(ex.Message);
         }
     }
 }

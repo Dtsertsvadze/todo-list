@@ -1,8 +1,5 @@
-﻿using Entities;
+﻿namespace ServiceContracts;
 using Entities.DTOs.TodoListDtos;
-
-namespace ServiceContracts;
-
 public interface IToDoListService
 {
     public Task<List<ToDoListResponse?>> GetToDoListsAsync();

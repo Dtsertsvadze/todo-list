@@ -1,7 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Entities.DTOs.CommentDtos;
-
+using System.ComponentModel.DataAnnotations;
 public class CommentUpdateRequest
 {
     public Guid Id { get; set; }
@@ -15,7 +13,7 @@ public class CommentUpdateRequest
         return new CommentEntity()
         {
             Id = this.Id,
-            Content = this.Content
+            Content = this.Content,
         };
     }
 }

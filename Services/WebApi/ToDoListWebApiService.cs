@@ -1,36 +1,44 @@
+namespace Services.WebApi;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Entities.DTOs.TodoListDtos;
-using Task = System.Threading.Tasks.Task;
-
-namespace Services.WebApi;
-
-public class ToDoListWebApiService
+using Microsoft.Extensions.Logging;
+using Task = Task;
+public class ToDoListWebApiService(HttpClient httpClient, ILogger<ToDoListWebApiService> logger)
 {
-    private readonly HttpClient _httpClient;
-
-    public ToDoListWebApiService(HttpClient httpClient)
+    public async Task<IEnumerable<ToDoListResponse>?> GetToDoListsAsync(string token)
     {
-        this._httpClient = httpClient;
-    }
+        try
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-    public async Task<ICollection<ToDoListResponse>> GetToDoListsAsync()
-    {
-        var response = await this._httpClient.GetAsync($"/api/ToDoList");
+            var response = await httpClient.GetAsync("/api/todolist");
 
-        response.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode();
 
-        var toDoLists = await response.Content.ReadFromJsonAsync<ICollection<ToDoListResponse>>();
+            var toDoLists = await response.Content.ReadFromJsonAsync<IEnumerable<ToDoListResponse>>();
 
-        ArgumentNullException.ThrowIfNull(toDoLists, nameof(toDoLists));
+            ArgumentNullException.ThrowIfNull(toDoLists, nameof(toDoLists));
 
-        return toDoLists;
+            return toDoLists;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "HTTP request failed: {ErrorMessage}", ex.Message);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error in GetToDoListsAsync: {ErrorMessage}", ex.Message);
+            throw;
+        }
     }
 
     public async Task<ToDoListResponse> CreateTodoListAsync(ToDoListAddRequest toDoListAddRequest)
     {
         try
         {
-            var response = await this._httpClient.PostAsJsonAsync("/api/todolist", toDoListAddRequest);
+            var response = await httpClient.PostAsJsonAsync("/api/todolist", toDoListAddRequest);
 
             response.EnsureSuccessStatusCode();
 
@@ -49,7 +57,7 @@ public class ToDoListWebApiService
 
     public async Task DeleteToDoListAsync(Guid id)
     {
-        var response = await this._httpClient.DeleteAsync($"/api/todolist/{id}");
+        var response = await httpClient.DeleteAsync($"/api/todolist/{id}");
         response.EnsureSuccessStatusCode();
     }
 
@@ -57,7 +65,7 @@ public class ToDoListWebApiService
     {
         try
         {
-            var response = await this._httpClient.PutAsJsonAsync($"/api/todolist/{id}", toDoListUpdateRequest);
+            var response = await httpClient.PutAsJsonAsync($"/api/todolist/{id}", toDoListUpdateRequest);
 
             response.EnsureSuccessStatusCode();
 
@@ -76,7 +84,7 @@ public class ToDoListWebApiService
 
     public async Task<ToDoListResponse> GetToDoListByIdAsync(Guid id)
     {
-        var response = await this._httpClient.GetAsync($"/api/todolist/{id}");
+        var response = await httpClient.GetAsync($"/api/todolist/Get/{id}");
 
         response.EnsureSuccessStatusCode();
 

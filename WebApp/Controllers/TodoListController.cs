@@ -1,24 +1,37 @@
+namespace WebApp.Controllers;
 using Entities.DTOs.TodoListDtos;
 using Microsoft.AspNetCore.Mvc;
 using Services.WebApi;
 
-namespace WebApp.Controllers;
-
 public class TodoListController : Controller
 {
     private readonly ToDoListWebApiService _toDoListWebApiService;
+    private readonly ILogger<TodoListController> _logger;
 
-    public TodoListController(ToDoListWebApiService toDoListWebApiService)
+    public TodoListController(ToDoListWebApiService toDoListWebApiService, ILogger<TodoListController> logger)
     {
         this._toDoListWebApiService = toDoListWebApiService;
+        this._logger = logger;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var toDoLists = await this._toDoListWebApiService.GetToDoListsAsync();
+        var jwtToken = Request.Cookies["jwtToken"];
+        if (string.IsNullOrEmpty(jwtToken))
+        {
+            return RedirectToAction("Login", "Account");
+        }
 
-        return View(toDoLists);
+        try
+        {
+            var todoLists = await this._toDoListWebApiService.GetToDoListsAsync(jwtToken);
+            return View(todoLists);
+        }
+        catch (HttpRequestException)
+        {
+            return StatusCode(500, "An error occurred while fetching todo lists.");
+        }
     }
 
     [HttpGet]
@@ -50,7 +63,9 @@ public class TodoListController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var toDoLists = await this._toDoListWebApiService.GetToDoListsAsync();
+        var toDoLists = await this._toDoListWebApiService.GetToDoListsAsync("dummy");
+
+        ArgumentNullException.ThrowIfNull(toDoLists, nameof(toDoLists));
 
         var toDoList = toDoLists.FirstOrDefault(t => t.Id == id);
 
@@ -72,7 +87,9 @@ public class TodoListController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id)
     {
-        var toDoLists = await this._toDoListWebApiService.GetToDoListsAsync();
+        var toDoLists = await this._toDoListWebApiService.GetToDoListsAsync("dummy");
+
+        ArgumentNullException.ThrowIfNull(toDoLists, nameof(toDoLists));
         var toDoList = toDoLists.FirstOrDefault(t => t.Id == id);
         if (toDoList == null)
         {

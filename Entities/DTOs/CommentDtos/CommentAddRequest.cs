@@ -1,6 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Entities.DTOs.CommentDtos;
+using System.ComponentModel.DataAnnotations;
 
 public class CommentAddRequest
 {

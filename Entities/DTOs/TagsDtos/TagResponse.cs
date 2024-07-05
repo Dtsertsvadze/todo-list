@@ -2,9 +2,9 @@ namespace Entities.DTOs.TagsDtos;
 
 public class TagResponse
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public string Name { get; set; }
+    public string? Name { get; init; }
 }
 
 public static class TagResponseExtensions
@@ -14,7 +14,7 @@ public static class TagResponseExtensions
         return new TagResponse
         {
             Id = tagEntity.Id,
-            Name = tagEntity.Name
+            Name = tagEntity.Name,
         };
     }
 }
