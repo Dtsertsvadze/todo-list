@@ -17,12 +17,7 @@ using Services.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add(new ProducesAttribute("application/json"));
-    options.Filters.Add(new ConsumesAttribute("application/json"));
-});
+builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen();
 
@@ -39,7 +34,7 @@ builder.Services.AddCors(options =>
         "AllowSpecificOrigin",
         build =>
         {
-            build.WithOrigins("http://localhost:5240") // Replace with your client-side application URL
+            build.WithOrigins("http://localhost:5240")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -74,22 +69,18 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     .AddUserStore<UserStore<ApplicationUser, ApplicationRole, UserDbContext, Guid>>()
     .AddRoleStore<RoleStore<ApplicationRole, UserDbContext, Guid>>();
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters()
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            ValidateIssuer = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] !)),
+            ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty)),
         };
     });
 

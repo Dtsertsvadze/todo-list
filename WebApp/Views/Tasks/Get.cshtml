@@ -1,12 +1,43 @@
 @model TaskResponse
 
 <div class="card mt-3">
-    <div class="card-header">
-        Task Details
-    </div>
+   <div class="d-flex justify-content-between align-items-center p-3 mb-2 bg-light text-dark">
+       <div><strong>Task Details</strong></div>
+       <div class="dropdown">
+           <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+               Actions
+           </button>
+               <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                   <li>
+                       <a class="dropdown-item" asp-controller="Tasks" asp-action="Edit" asp-route-toDoListId="@Model.ToDoListId" asp-route-taskId="@Model.Id">
+                           <i class="fas fa-edit me-2"></i> Edit
+                       </a>
+                   </li>
+                   <li>
+                       <a class="dropdown-item" asp-controller="Tags" asp-action="AddTag" asp-route-taskId="@Model.Id">
+                           <i class="fas fa-plus me-2"></i> Add Tag
+                       </a>
+                   </li>
+                   <li>
+                       <a asp-controller="Tasks" asp-action="Delete" asp-route-toDoListId="@Model.ToDoListId" asp-route-taskId="@Model.Id"
+                          class="text-danger dropdown-item" title="Delete">
+                           Delete
+                           <i class="fas fa-times"></i>
+                       </a>
+                   </li>
+                   <li>
+                       <a asp-controller="Tasks" asp-action="Complete" asp-route-toDoListId="@Model.ToDoListId" asp-route-taskId="@Model.Id"
+                          class="text-success dropdown-item" title="Complete">
+                           Complete
+                           <i class="fas fa-check"></i>
+                       </a>
+                   </li>
+               </ul>
+           </div>
+       </div>
     <div class="card-body">
-        <h5 class="card-title">@Model.Title</h5>
-        <p class="card-text">@Model.Description</p>
+        <h5 class="card-title"><span class="fw-bold">Title:</span> @Model.Title</h5>
+        <p class="card-text"><span class="fw-bold">Description: </span> @Model.Description</p>
         <p class="card-text"><strong>Creation Date:</strong> @Model.CreatedAt.ToString("dd MMM yyyy")</p>
         <p class="card-text">
             <strong>Due Date:</strong>
@@ -42,18 +73,74 @@
         </p>
         @if (Model.Tags != null && Model.Tags.Any())
         {
-            <p class="card-text">
-                <strong>Tags:</strong>
-                @foreach (var tag in Model.Tags)
+            var uniqueTags = Model.Tags.GroupBy(tag => tag.Name).Select(g => g.First()).ToList();
+
+            <div class="card-text">
+                <div><strong>Tags:</strong></div>
+                @foreach (var tag in uniqueTags)
                 {
-                    <span class="@GetTagCssClass(tag.Name!)">@tag.Name</span>
+                    <span class="@($"badge {GetTagCssClass(tag.Name!)}")">
+                        @tag.Name
+                        <form method="post" action="@Url.Action("RemoveTag", "Tags")" style="display: inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="tagId" value="@tag.Id" />
+                            <input type="hidden" name="taskId" value="@Model.Id" />
+                            <input type="hidden" name="todoListId" value="@Model.ToDoListId" />
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Are you sure you want to remove this tag?');"
+                                    style="padding: 0 4px; line-height: 1.2;">&times;</button>
+                        </form>
+                    </span>
                 }
-            </p>
+            </div>
         }
     </div>
-    <div class="card-footer">
-        <a asp-controller="TodoList" asp-action="Get" asp-route-id="@Model.ToDoListId" class="btn btn-primary">Back to To-Do List</a>
+    <div class="card-body">
+        <h5>Comments</h5>
+      @if (Model.Comments != null && Model.Comments.Any())
+      {
+          foreach (var comment in Model.Comments)
+          {
+              <div class="card mb-3">
+                  <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                              <h6 class="card-subtitle mb-2 text-muted">@ViewBag.UserName</h6>
+                              <p class="card-text">@comment.Content</p>
+                          </div>
+                          <div class="dropdown">
+                              <button class="btn btn-sm btn-outline-secondary" type="button" id="dropdownMenuButton-@comment.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <i class="fas fa-ellipsis-v"></i>
+                              </button>
+                              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton-@comment.Id">
+                                  <a class="dropdown-item" asp-controller="Comments" asp-action="EditComment" asp-route-commentId="@comment.Id" asp-route-taskId="@Model.Id">
+                                      <i class="fas fa-edit me-2"></i> Edit
+                                  </a>
+                                  <a class="dropdown-item text-danger" asp-controller="Comments" asp-action="RemoveComment" asp-route-commentId="@comment.Id" asp-route-taskId="@Model.Id">
+                                      <i class="fas fa-trash-alt me-2"></i> Delete
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="text-muted">
+                          <small>@comment.CreatedAt.ToString("dd MMM yyyy HH:mm")</small>
+                      </div>
+                  </div>
+              </div>
+          }
+      }
+      else
+      {
+          <p class="text-muted">No comments yet.</p>
+      }
     </div>
+    <div class="card-footer">
+        <a asp-controller="TodoList" asp-action="Get" asp-route-id="@Model.ToDoListId" class="btn btn-primary">Back to Tasks</a>
+    </div>
+    <a asp-controller="Comments" asp-action="AddComment" asp-route-taskId="@Model.Id" class="btn btn-secondary mt-2">
+        <i class="fas fa-comment me-2"></i>Add Comment
+    </a>
 </div>
 
 @functions {
@@ -69,7 +156,7 @@
             "work" => "badge tag-work",
             "home" => "badge tag-home",
             "health" => "badge tag-health",
-            _ => "badge badge-secondary" // Default class
+            _ => "badge badge-secondary"
             };
     }
 }

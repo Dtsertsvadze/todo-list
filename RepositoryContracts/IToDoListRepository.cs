@@ -2,7 +2,7 @@ namespace RepositoryContracts;
 using Entities;
 public interface IToDoListRepository
 {
-    Task<IEnumerable<ToDoListEntity?>> GetToDoListsAsync();
+    Task<IEnumerable<ToDoListEntity?>> GetToDoListsAsync(Guid userId);
 
     Task<ToDoListEntity?> GetToDoListAsync(Guid toDoListId);
 

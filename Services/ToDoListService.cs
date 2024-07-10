@@ -5,9 +5,9 @@ using ServiceContracts;
 public class ToDoListService(IToDoListRepository toDoListRepository)
     : IToDoListService
 {
-    public async Task<List<ToDoListResponse?>> GetToDoListsAsync()
+    public async Task<List<ToDoListResponse?>> GetToDoListsAsync(Guid userId)
     {
-        var toDoLists = await toDoListRepository.GetToDoListsAsync();
+        var toDoLists = await toDoListRepository.GetToDoListsAsync(userId);
 
         return toDoLists.Select(temp => temp?.ToToDoListResponse()).ToList();
     }

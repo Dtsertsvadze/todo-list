@@ -38,7 +38,7 @@ public class TagsController(TagsWebApiService tagsWebApiService, TasksWebApiServ
             if (addedTag != null)
             {
                 TempData["SuccessMessage"] = "Tag added successfully.";
-                return RedirectToAction("Get", "TodoList", new { id = todoListId.ToDoListId });
+                return RedirectToAction("Get", "Tasks", new { todoListId.ToDoListId, taskId });
             }
             else
             {
@@ -56,19 +56,11 @@ public class TagsController(TagsWebApiService tagsWebApiService, TasksWebApiServ
     }
 
     [HttpPost]
-    public async Task<IActionResult> RemoveTag(Guid toDoListId, Guid tagId)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveTag(Guid tagId, Guid taskId, Guid toDoListId)
     {
-        try
-        {
-            await tagsWebApiService.DeleteTag(tagId);
-            TempData["SuccessMessage"] = "Tag deleted successfully.";
-        }
-        catch (HttpRequestException)
-        {
-            TempData["ErrorMessage"] = "Failed to delete the tag. Please try again.";
-        }
+        await tagsWebApiService.DeleteTag(tagId);
 
-        // Redirect back to the TodoLists Get action
-        return RedirectToAction("Get", "TodoList", new { id = toDoListId });
+        return RedirectToAction("Get", "Tasks", new { toDoListId, taskId });
     }
 }

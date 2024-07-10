@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Database.Migrations
 {
     [DbContext(typeof(ToDoListDbContext))]
-    [Migration("20240703155445_Initial")]
+    [Migration("20240710060732_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -29,6 +29,9 @@ namespace Database.Migrations
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("TaskId")
@@ -126,6 +129,9 @@ namespace Database.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

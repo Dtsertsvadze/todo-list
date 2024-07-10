@@ -15,6 +15,11 @@
         <input asp-for="Description" class="form-control" />
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
+    <div class="form-group">
+        <label asp-for="DueDateTime">Due Date</label>
+        <input type="date" asp-for="DueDateTime" class="form-control" value="@DateTime.Now" />
+        <span asp-validation-for="DueDateTime" class="text-danger"></span>
+    </div>
 </form>
 
 <button type="submit" form="taskEditForm" class="btn btn-outline-primary mt-5">Update</button>

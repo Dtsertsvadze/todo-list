@@ -15,4 +15,6 @@ public class CommentEntity
 
     [ForeignKey("TaskId")]
     public TaskEntity? Task { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 }

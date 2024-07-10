@@ -16,6 +16,7 @@ public class CommentAddRequest
         {
             Content = this.Content,
             TaskId = this.TaskId,
+            CreatedAt = DateTime.Now,
         };
     }
 }

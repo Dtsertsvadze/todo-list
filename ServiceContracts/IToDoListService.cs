@@ -2,7 +2,7 @@
 using Entities.DTOs.TodoListDtos;
 public interface IToDoListService
 {
-    public Task<List<ToDoListResponse?>> GetToDoListsAsync();
+    public Task<List<ToDoListResponse?>> GetToDoListsAsync(Guid userId);
 
     public Task<ToDoListResponse?> GetToDoListAsync(Guid toDoListId);
 

@@ -14,6 +14,8 @@ public class ToDoListResponse
     public DateTime? CreatedAt { get; set; }
 
     public List<TaskResponse>? Tasks { get; set; }
+
+    public Guid? UserId { get; set; }
 }
 
 public static class ToDoListExtensions
@@ -27,6 +29,7 @@ public static class ToDoListExtensions
             Description = toDoList.Description,
             IsComplete = toDoList.IsComplete,
             CreatedAt = toDoList.CreatedAt,
+            UserId = toDoList.UserId,
             Tasks = toDoList.Tasks?.Select(t => t.ToTaskResponse()).ToList(),
         };
     }

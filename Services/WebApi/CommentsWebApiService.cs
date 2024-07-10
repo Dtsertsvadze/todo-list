@@ -5,7 +5,7 @@ public class CommentsWebApiService(HttpClient httpClient)
 {
     public async Task<bool> AddCommentAsync(Guid taskId, CommentAddRequest commentAddRequest)
     {
-        var response = await httpClient.PostAsJsonAsync($"/api/tasks/{taskId}/comments", commentAddRequest);
+        var response = await httpClient.PostAsJsonAsync($"/api/comments/{taskId}/AddCommentToTask", commentAddRequest);
 
         response.EnsureSuccessStatusCode();
 

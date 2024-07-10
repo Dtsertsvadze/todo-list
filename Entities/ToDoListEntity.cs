@@ -1,4 +1,6 @@
 ﻿namespace Entities;
+using System.ComponentModel.DataAnnotations.Schema;
+using Identity;
 using System.ComponentModel.DataAnnotations;
 public class ToDoListEntity
 {
@@ -18,4 +20,6 @@ public class ToDoListEntity
     public DateTime? CreatedAt { get; set; }
 
     public ICollection<TaskEntity>? Tasks { get; set; }
+
+    public Guid UserId { get; set; }
 }

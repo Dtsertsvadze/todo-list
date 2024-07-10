@@ -14,10 +14,10 @@ public class ToDoListController : ControllerBase
         this._toDoListService = toDoListService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetToDoLists()
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetToDoLists(Guid userId)
     {
-        var toDoLists = await this._toDoListService.GetToDoListsAsync();
+        var toDoLists = await this._toDoListService.GetToDoListsAsync(userId);
 
         return Ok(toDoLists);
     }

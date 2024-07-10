@@ -28,6 +28,9 @@ namespace Database.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("TaskId")
                         .HasColumnType("TEXT");
 
@@ -123,6 +126,9 @@ namespace Database.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

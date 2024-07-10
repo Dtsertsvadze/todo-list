@@ -1,4 +1,6 @@
 namespace WebAPI.Controllers;
+using Services;
+using Entities.DTOs.Password;
 using System.Security.Claims;
 using Entities.DTOs.LogInDto;
 using Entities.DTOs.RegisterDtos;
@@ -149,5 +151,71 @@ public class AccountController : ControllerBase
     {
         await this._signInManager.SignOutAsync();
         return NoContent();
+    }
+
+    [HttpGet("profile")]
+    public async Task<ActionResult<ApplicationUser>> GetProfile(string token)
+    {
+        ArgumentNullException.ThrowIfNull(token, nameof(token));
+
+        var userId = DecodeJwtTokenUserId.GetUserIdFromToken(token);
+
+        var user = await this._userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var profile = new ApplicationUser
+        {
+            Email = user.Email,
+            PersonName = user.PersonName,
+            PhoneNumber = user.PhoneNumber,
+        };
+
+        return Ok(profile);
+    }
+
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(PasswordChangeRequest request, string token)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var userId = DecodeJwtTokenUserId.GetUserIdFromToken(token);
+
+        var user = await this._userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        if (request.CurrentPassword == null)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (request.NewPassword == null)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await this._userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+
+        if (result.Succeeded)
+        {
+            return Ok(new { message = "Password changed successfully" });
+        }
+
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+
+        return BadRequest(ModelState);
     }
 }

@@ -1,4 +1,5 @@
 namespace WebApp.Controllers;
+using Services;
 using Entities.DTOs.TodoListDtos;
 using Microsoft.AspNetCore.Mvc;
 using Services.WebApi;
@@ -25,7 +26,10 @@ public class TodoListController : Controller
 
         try
         {
-            var todoLists = await this._toDoListWebApiService.GetToDoListsAsync(jwtToken);
+            Guid str = DecodeJwtTokenUserId.GetUserIdFromToken(jwtToken);
+
+            var todoLists = await this._toDoListWebApiService.GetToDoListsAsync(jwtToken, str);
+
             return View(todoLists);
         }
         catch (HttpRequestException)
@@ -56,6 +60,8 @@ public class TodoListController : Controller
             return View(toDoList);
         }
 
+        toDoList.UserId = DecodeJwtTokenUserId.GetUserIdFromToken(Request.Cookies["jwtToken"] !);
+
         await this._toDoListWebApiService.CreateTodoListAsync(toDoList);
         return RedirectToAction(nameof(this.Index));
     }
@@ -63,16 +69,9 @@ public class TodoListController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var toDoLists = await this._toDoListWebApiService.GetToDoListsAsync("dummy");
+        var toDoList = await this._toDoListWebApiService.GetToDoListByIdAsync(id);
 
-        ArgumentNullException.ThrowIfNull(toDoLists, nameof(toDoLists));
-
-        var toDoList = toDoLists.FirstOrDefault(t => t.Id == id);
-
-        if (toDoList == null)
-        {
-            return NotFound();
-        }
+        ArgumentNullException.ThrowIfNull(toDoList, nameof(toDoList));
 
         return View(toDoList);
     }
@@ -87,14 +86,9 @@ public class TodoListController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id)
     {
-        var toDoLists = await this._toDoListWebApiService.GetToDoListsAsync("dummy");
+        var toDoList = await this._toDoListWebApiService.GetToDoListByIdAsync(id);
 
-        ArgumentNullException.ThrowIfNull(toDoLists, nameof(toDoLists));
-        var toDoList = toDoLists.FirstOrDefault(t => t.Id == id);
-        if (toDoList == null)
-        {
-            return NotFound();
-        }
+        ArgumentNullException.ThrowIfNull(toDoList, nameof(toDoList));
 
         return View(toDoList);
     }

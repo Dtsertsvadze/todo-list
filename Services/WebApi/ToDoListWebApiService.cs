@@ -6,13 +6,13 @@ using Microsoft.Extensions.Logging;
 using Task = Task;
 public class ToDoListWebApiService(HttpClient httpClient, ILogger<ToDoListWebApiService> logger)
 {
-    public async Task<IEnumerable<ToDoListResponse>?> GetToDoListsAsync(string token)
+    public async Task<IEnumerable<ToDoListResponse>?> GetToDoListsAsync(string token, Guid userId)
     {
         try
         {
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await httpClient.GetAsync("/api/todolist");
+            var response = await httpClient.GetAsync($"/api/todolist/{userId}");
 
             response.EnsureSuccessStatusCode();
 

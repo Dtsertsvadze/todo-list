@@ -16,33 +16,30 @@ public class JwtService(IConfiguration configuration)
     {
         DateTime expiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(configuration["Jwt:ExpirationMinutes"]));
 
-        Claim[] claims = new[]
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"] !);
+
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
-            new Claim(ClaimTypes.NameIdentifier, user.Email!), new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.Email, user.Email!),
+            new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new (JwtRegisteredClaimNames.Sub, user.Email !),
+            new (JwtRegisteredClaimNames.Email, user.Email !),
+            new (JwtRegisteredClaimNames.UniqueName, user.PersonName !),
+            new ("userId", user.Id.ToString()),
         };
 
-        SymmetricSecurityKey key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(configuration["Jwt:Key"] !));
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = expiration,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
+        };
 
-        SigningCredentials signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        JwtSecurityToken tokenGenerator = new JwtSecurityToken(
-            configuration["Jwt:Issuer"],
-            configuration["Jwt:Audience"],
-            claims,
-            expires: expiration,
-            signingCredentials: signingCredentials);
-
-        JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-        string token = tokenHandler.WriteToken(tokenGenerator);
+        var token = tokenHandler.CreateToken(tokenDescriptor);
 
         return new AuthenticationResponse
         {
-            Token = token,
+            Token = tokenHandler.WriteToken(token),
             Email = user.Email,
             PersonName = user.PersonName,
             Expiration = expiration,

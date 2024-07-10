@@ -1,4 +1,5 @@
 namespace WebApp.Controllers;
+using Entities.DTOs.Password;
 using Entities.DTOs.LogInDto;
 using Entities.DTOs.RegisterDtos;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,42 @@ public class AccountController : Controller
     {
         this._logger = logger;
         this._accountWebApiService = accountWebApiService;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var token = Request.Cookies["jwtToken"];
+        var profile = await this._accountWebApiService.GetUserProfileAsync(token !);
+        return View(profile);
+    }
+
+    [HttpGet]
+    public IActionResult ChangePassword()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(PasswordChangeRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(request);
+        }
+
+        try
+        {
+            var token = Request.Cookies["jwtToken"];
+
+            await this._accountWebApiService.ChangePasswordAsync(request, token !);
+            TempData["SuccessMessage"] = "Password changed successfully";
+            return RedirectToAction(nameof(this.Index));
+        }
+        catch (HttpRequestException)
+        {
+            ModelState.AddModelError(string.Empty, "Failed to change password. Please try again.");
+            return View(request);
+        }
     }
 
     [HttpGet("register")]
@@ -64,9 +101,8 @@ public class AccountController : Controller
                 HttpContext.Response.Cookies.Append("jwtToken", authResponse.Token, new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Use only if your site uses HTTPS
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddHours(1), // Or whatever expiration time you prefer
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
                 });
 
                 return RedirectToAction(nameof(TodoListController.Index), "TodoList");

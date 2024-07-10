@@ -15,6 +15,8 @@ public class ToDoListAddRequest
 
     public DateTime? CreatedAt { get; set; }
 
+    public Guid UserId { get; set; }
+
     public ToDoListEntity ToToDoList()
     {
         return new ToDoListEntity()
@@ -23,6 +25,7 @@ public class ToDoListAddRequest
             Description = this.Description,
             IsComplete = this.IsComplete,
             CreatedAt = this.CreatedAt,
+            UserId = this.UserId,
         };
     }
 }

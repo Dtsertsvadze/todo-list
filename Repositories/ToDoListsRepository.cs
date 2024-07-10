@@ -4,12 +4,13 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
-public class ToDoListsRepository(ToDoListDbContext db)
+public class ToDoListsRepository(ToDoListDbContext db, UserDbContext dbb)
     : IToDoListRepository
 {
-    public async Task<IEnumerable<ToDoListEntity?>> GetToDoListsAsync()
+    public async Task<IEnumerable<ToDoListEntity?>> GetToDoListsAsync(Guid userId)
     {
         return await db.ToDoLists
+            .Where(tdl => tdl.UserId == userId)
             .Include(t => t.Tasks) !
             .ThenInclude(t => t.Comments)
             .Include(t => t.Tasks) !
@@ -31,6 +32,11 @@ public class ToDoListsRepository(ToDoListDbContext db)
 
     public async Task<ToDoListEntity> CreateToDoListAsync(ToDoListEntity toDoListEntity)
     {
+        if (!await dbb.Users.AnyAsync(u => u.Id == toDoListEntity.UserId))
+        {
+            throw new Exception("User does not exist.");
+        }
+
         db.ToDoLists.Add(toDoListEntity);
         await db.SaveChangesAsync();
 

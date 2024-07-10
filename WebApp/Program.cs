@@ -21,6 +21,10 @@ builder.Services.AddHttpClient<TagsWebApiService>(client =>
 {
     client.BaseAddress = new Uri("http://localhost:5130");
 });
+builder.Services.AddHttpClient<CommentsWebApiService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5130");
+});
 
 var app = builder.Build();
 
@@ -35,6 +39,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>

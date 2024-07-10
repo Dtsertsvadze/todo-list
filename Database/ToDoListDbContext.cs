@@ -1,4 +1,5 @@
 ﻿namespace Database;
+using Entities.Identity;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 public class ToDoListDbContext : DbContext

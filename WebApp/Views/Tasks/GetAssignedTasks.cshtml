@@ -1,0 +1,99 @@
+@model List<TaskResponse>
+
+<div class="container mt-5">
+    <h2 class="mt-5">Assigned Tasks</h2>
+
+    <form asp-action="GetAssignedTasks" asp-controller="Tasks" method="get" class="mb-3">
+        <input type="hidden" name="userId" value="@ViewBag.UserId" />
+        <input type="hidden" name="sortBy" value="@ViewBag.SortBy" />
+
+        <label for="filterStatus" class="form-label">Filter by Status:</label>
+        <select id="filterStatus" name="filterStatus" class="form-select" onchange="this.form.submit()">
+            <option value="active" selected="@(ViewBag.FilterStatus == "active")">Active</option>
+            <option value="completed" selected="@(ViewBag.FilterStatus == "completed")">Completed</option>
+            <option value="all" selected="@(ViewBag.FilterStatus == "all")">All</option>
+        </select>
+    </form>
+
+    @if (Model.Count == 0)
+    {
+        <p>No tasks found.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover mt-3">
+                <thead class="thead-dark">
+                <tr>
+                    <th>
+                        <form asp-action="GetAssignedTasks" asp-controller="Tasks" method="get" class="d-inline">
+                            <input type="hidden" name="userId" value="@ViewBag.UserId" />
+                            <input type="hidden" name="filterStatus" value="@ViewBag.FilterStatus" />
+                            <button type="submit" name="sortBy" value="title" class="btn btn-link text-light p-0">
+                                Title @(ViewBag.SortBy == "title" ? "▼" : "")
+                            </button>
+                        </form>
+                    </th>
+                    <th>
+                        <form asp-action="GetAssignedTasks" asp-controller="Tasks" method="get" class="d-inline">
+                            <input type="hidden" name="userId" value="@ViewBag.UserId" />
+                            <input type="hidden" name="filterStatus" value="@ViewBag.FilterStatus" />
+                            <button type="submit" name="sortBy" value="dueDate" class="btn btn-link text-light p-0">
+                                Due Date @(ViewBag.SortBy == "dueDate" ? "▼" : "")
+                            </button>
+                        </form>
+                    </th>
+                    <th>Status</th>
+                    <th>Tags</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr class="@(DateTime.Now > task.DueDateTime && !task.IsComplete ? "table-danger" : "")">
+                        <td>@task.Title</td>
+                        <td>
+                            @(DateTime.Now > task.DueDateTime && !task.IsComplete ? "Overdue" : task.DueDateTime.ToString("dd MMM yyyy"))
+                        </td>
+                        <td>
+                            <span class="badge @(task.IsComplete ? "bg-success" : "bg-warning text-dark")">
+                                @(task.IsComplete ? "Completed" : "Active")
+                            </span>
+                        </td>
+                        <td>
+                            @foreach (var tag in task.Tags !)
+                            {
+                                <span class="@GetTagCssClass(tag.Name !)">@tag.Name</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Get", "Tasks", new { toDoListId = task.ToDoListId, taskId = task.Id})" class="btn btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@functions {
+    private static string GetTagCssClass(string tagName)
+    {
+        return tagName.ToLower() switch
+        {
+            "urgent" => "badge tag-urgent",
+            "high_priority" => "badge tag-high-priority",
+            "medium_priority" => "badge tag-medium-priority",
+            "low_priority" => "badge tag-low-priority",
+            "personal" => "badge tag-personal",
+            "work" => "badge tag-work",
+            "home" => "badge tag-home",
+            "health" => "badge tag-health",
+            _ => "badge badge-secondary" // Default class
+            };
+    }
+}

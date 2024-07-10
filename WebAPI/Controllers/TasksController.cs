@@ -21,7 +21,7 @@ public class TasksController : ControllerBase
         return Ok(task);
     }
 
-    [HttpGet("{taskId}")]
+    [HttpGet("{taskId}/[action]")]
     public async Task<IActionResult> GetTask(Guid taskId)
     {
         try
@@ -53,7 +53,7 @@ public class TasksController : ControllerBase
     {
         var updatedTask = await this._tasksService.UpdateTaskAsync(taskId, taskUpdateRequest);
 
-        return this.Ok(updatedTask);
+        return Ok(updatedTask);
     }
 
     [HttpDelete("{toDoListId}/Tasks/{taskId}")]
@@ -62,10 +62,10 @@ public class TasksController : ControllerBase
         var success = await this._tasksService.DeleteTaskAsync(taskId);
         if (!success)
         {
-            return this.NotFound();
+            return NotFound();
         }
 
-        return this.NoContent();
+        return NoContent();
     }
 
     [HttpPut("{toDoListId}/Tasks/{taskId}/complete")]
@@ -74,9 +74,9 @@ public class TasksController : ControllerBase
         var success = await this._tasksService.CompleteTaskAsync(taskId);
         if (!success)
         {
-            return this.NotFound();
+            return NotFound();
         }
 
-        return this.NoContent();
+        return NoContent();
     }
 }

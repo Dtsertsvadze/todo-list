@@ -1,4 +1,5 @@
 namespace Services.WebApi;
+using Entities.DTOs.Password;
 using System.Net.Http.Json;
 using Entities.DTOs.LogInDto;
 using Entities.DTOs.RegisterDtos;
@@ -52,5 +53,35 @@ public class AccountWebApiService(HttpClient httpClient)
     {
         var response = await httpClient.GetAsync("api/account/logout");
         return response.IsSuccessStatusCode;
+    }
+
+    public async Task<UserProfileResponse?> GetUserProfileAsync(string token)
+    {
+        try
+        {
+            var response = await httpClient.GetAsync("api/account/profile?token=" + token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<UserProfileResponse>();
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"API request failed with status code {response.StatusCode}. Response content: {content}");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to retrieve user profile", ex);
+        }
+    }
+
+    public async Task ChangePasswordAsync(PasswordChangeRequest request, string token)
+    {
+        var response = await httpClient.PostAsJsonAsync("api/account/change-password?token=" + token, request);
+        response.EnsureSuccessStatusCode();
     }
 }

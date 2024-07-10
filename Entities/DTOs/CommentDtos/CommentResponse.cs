@@ -7,6 +7,8 @@ public class CommentResponse
     public string? Content { get; set; }
 
     public Guid TaskId { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 }
 
 public static class CommentResponseExtensions
@@ -18,6 +20,7 @@ public static class CommentResponseExtensions
             Id = comment.Id,
             Content = comment.Content,
             TaskId = comment.TaskId,
+            CreatedAt = comment.CreatedAt,
         };
     }
 }

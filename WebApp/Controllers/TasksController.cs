@@ -1,4 +1,6 @@
 namespace WebApp.Controllers;
+using Microsoft.AspNetCore.Authorization;
+using Services;
 using Entities.DTOs.TagsDtos;
 using Entities.DTOs.TasksDtos;
 using Microsoft.AspNetCore.Mvc;
@@ -8,13 +10,50 @@ public class TasksController : Controller
 {
     private readonly TagsWebApiService _tagsWebApiService;
     private readonly TasksWebApiService _tasksWebApiService;
+    private readonly ToDoListWebApiService _toDoListWebApiService;
     private readonly ILogger<TasksController> _logger;
 
-    public TasksController(TasksWebApiService tasksWebApiService, ILogger<TasksController> logger, TagsWebApiService tagsWebApiService)
+    public TasksController(TasksWebApiService tasksWebApiService, ILogger<TasksController> logger, TagsWebApiService tagsWebApiService, ToDoListWebApiService toDoListWebApiService)
     {
         this._logger = logger;
         this._tagsWebApiService = tagsWebApiService;
         this._tasksWebApiService = tasksWebApiService;
+        this._toDoListWebApiService = toDoListWebApiService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAssignedTasks(Guid userId, string sortBy = "dueDate", string filterStatus = "active")
+    {
+        var token = Request.Cookies["jwtToken"];
+
+        if (string.IsNullOrEmpty(token))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var todoLists = await this._toDoListWebApiService.GetToDoListsAsync(token, userId);
+
+        var tasks = todoLists!.SelectMany(tdl => tdl.Tasks!).ToList();
+
+        tasks = filterStatus.ToLower() switch
+        {
+            "active" => tasks.Where(t => !t.IsComplete).ToList(),
+            "completed" => tasks.Where(t => t.IsComplete).ToList(),
+            _ => tasks
+        };
+
+        tasks = sortBy.ToLower() switch
+        {
+            "title" => tasks.OrderBy(t => t.Title).ToList(),
+            "duedate" => tasks.OrderBy(t => t.DueDateTime).ToList(),
+            _ => tasks
+        };
+
+        ViewBag.SortBy = sortBy;
+        ViewBag.FilterStatus = filterStatus;
+        ViewBag.UserId = userId;
+
+        return View(tasks);
     }
 
     [HttpGet]
@@ -52,6 +91,10 @@ public class TasksController : Controller
     public async Task<IActionResult> Get(Guid toDoListId, Guid taskId)
     {
         var task = await this._tasksWebApiService.GetTaskAsync(toDoListId, taskId);
+
+        var userName = DecodeJwtTokenUserId.GetUserNameFromToken(Request.Cookies["jwtToken"] !);
+
+        ViewBag.UserName = userName;
 
         return View(task);
     }
@@ -112,7 +155,7 @@ public class TasksController : Controller
         try
         {
             await this._tasksWebApiService.CompleteTaskAsync(toDoListId, taskId);
-            return RedirectToAction("Get", "ToDoList", new { id = toDoListId });
+            return RedirectToAction("Get", "Tasks", new { toDoListId, taskId });
         }
         catch (HttpRequestException ex)
         {
@@ -120,9 +163,60 @@ public class TasksController : Controller
 
             ModelState.AddModelError(string.Empty, "An error occurred while completing the task. Please try again.");
 
-            // Retrieve the task again to redisplay the form
             var task = await this._tasksWebApiService.GetTaskAsync(toDoListId, taskId);
             return View(task);
         }
+    }
+
+    [HttpGet]
+    public IActionResult Search()
+    {
+        var token = Request.Cookies["jwtToken"];
+
+        if (string.IsNullOrEmpty(token))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        return View(new List<TaskResponse>());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Search(string query, string criteria)
+    {
+        if (string.IsNullOrEmpty(query))
+        {
+            return View(new List<TaskResponse>());
+        }
+
+        var token = Request.Cookies["jwtToken"];
+        var userId = DecodeJwtTokenUserId.GetUserIdFromToken(token!);
+        var todoLists = await this._toDoListWebApiService.GetToDoListsAsync(token!, userId);
+        var tasks = todoLists!.SelectMany(tdl => tdl.Tasks!).ToList();
+
+        List<TaskResponse> filteredTasks = new List<TaskResponse>();
+
+        switch (criteria.ToLower())
+        {
+            case "title":
+                filteredTasks = tasks.Where(t => t.Title != null && t.Title.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+                break;
+            case "creationdate":
+                if (DateTime.TryParse(query, out DateTime creationDate))
+                {
+                    filteredTasks = tasks.Where(t => t.CreatedAt.Date == creationDate.Date).ToList();
+                }
+
+                break;
+            case "duedate":
+                if (DateTime.TryParse(query, out DateTime dueDate))
+                {
+                    filteredTasks = tasks.Where(t => t.DueDateTime.Date == dueDate.Date).ToList();
+                }
+
+                break;
+        }
+
+        return View(filteredTasks);
     }
 }

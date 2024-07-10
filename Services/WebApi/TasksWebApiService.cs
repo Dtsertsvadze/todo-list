@@ -19,7 +19,7 @@ public class TasksWebApiService(HttpClient httpClient)
 
     public async Task<TaskResponse?> GetTaskByIdAsync(Guid taskId)
     {
-        var response = await httpClient.GetAsync($"/api/todolist/{taskId}");
+        var response = await httpClient.GetAsync($"/api/todolist/{taskId}/GetTask");
 
         response.EnsureSuccessStatusCode();
 

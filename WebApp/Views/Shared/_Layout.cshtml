@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.IdentityModel.Tokens.Jwt
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -28,17 +29,18 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav mx-auto gap-3">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Assigned Tasks</a>
+                   <a class="nav-link" asp-controller="Tasks" asp-action="GetAssignedTasks" asp-route-userId="@GetUserIdByJwtToken()">Assigned Tasks</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Search</a>
+                    <a class="nav-link" asp-controller="Tasks" asp-action="Search">Search</a>
                 </li>
             </ul>
             @if (isLoggedIn)
             {
                 <form class="d-flex" method="post" asp-controller="Account" asp-action="Logout">
-                    <button class="btn btn-outline-danger" type="submit">Logout</button>
-                </form>
+                   <button class="btn btn-outline-danger me-2" type="submit">Logout</button>
+               </form>
+                <a class="btn btn-outline-info" asp-controller="Account" asp-action="Index">Profile</a>
             }
             else
             {
@@ -63,3 +65,26 @@
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+@functions
+{
+    private string GetUserIdByJwtToken()
+    {
+        var jwtToken = Context.Request.Cookies["jwtToken"];
+        if (string.IsNullOrEmpty(jwtToken))
+        {
+            return string.Empty;
+        }
+
+        var handler = new JwtSecurityTokenHandler();
+        try
+        {
+            var token = handler.ReadJwtToken(jwtToken);
+            return token.Claims.First(claim => claim.Type == "userId").Value;
+        }
+        catch (ArgumentException)
+        {
+            return string.Empty;
+        }
+    }
+}

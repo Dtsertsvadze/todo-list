@@ -1,21 +1,26 @@
 @model TaskResponse
 
-<h2>Delete Task</h2>
-
-<p>Are you sure you want to delete the following task?</p>
-
-<div>
-    <dl>
-        <dt>@Html.DisplayNameFor(model => model.Title)</dt>
-        <dd>@Html.DisplayFor(model => model.Title)</dd>
-        <dt>@Html.DisplayNameFor(model => model.Description)</dt>
-        <dd>@Html.DisplayFor(model => model.Description)</dd>
-    </dl>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h2>Delete Task</h2>
+        </div>
+        <div class="card-body">
+            <p>Are you sure you want to delete the following task?</p>
+            <div>
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Title)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Title)</dd>
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+                </dl>
+            </div>
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ToDoListId" />
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a asp-controller="TodoList" asp-action="Get" asp-route-id="@Model.ToDoListId" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="ToDoListId" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-controller="TodoList" asp-action="Get" asp-route-id="@Model.ToDoListId" class="btn btn-primary">Cancel</a>
-</form>
